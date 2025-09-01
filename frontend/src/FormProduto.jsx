@@ -37,7 +37,7 @@ function FormProduto({ onProductAdded }) {
       const obj = { 
         ...data, 
         id: newId.toString(),
-        preco: parseFloat(data.preco) // Garantir que preço seja número
+        preco: parseFloat(data.preco)
       };
       
       const response = await fetch("http://localhost:3000/produtos", {
@@ -74,7 +74,6 @@ function FormProduto({ onProductAdded }) {
 
   return (
     <>
-      <h1>Cadastrar Produto</h1>
       <form onSubmit={sendProduto}>
         <label htmlFor="nome">Nome do Produto</label>
         <input

@@ -4,6 +4,7 @@ import FormUsuario from './FormUsuario'
 import TableUsuario from './TableUsuario'
 import FormProduto from './FormProduto'
 import TableProduto from './TableProduto'
+import FormCompras from './FormCompras'
 
 
 function App() {
@@ -18,16 +19,46 @@ function App() {
     setRefreshTrigger(prev => prev + 1);
   };
 
-  return (
-    <>
-      <h1>Seja bem vindo!</h1>
-      <p>Desenvolva seu website usando React!</p>
-      <FormUsuario onUserAdded={handleUserAdded}></FormUsuario>
-      <TableUsuario refreshTrigger={refreshTrigger}></TableUsuario>
-      <FormProduto onProductAdded={handleProductAdded}></FormProduto>
-      <TableProduto refreshTrigger={refreshTrigger}></TableProduto>
-    </>
+   const handleUserDeleted = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  const handleProductDeleted = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+ return (
+    <div className="geral">
+      <h1>Sistema de Vendas</h1>
+      
+      <div className="forms-container">
+        <div className="form-item">
+          <h2>Cadastro de Usuários</h2>
+          <FormUsuario onUserAdded={handleUserAdded}></FormUsuario>
+        </div>
+        <div className="form-item">
+          <h2>Cadastro de Produtos</h2>
+          <FormProduto onProductAdded={handleProductAdded}></FormProduto>
+        </div>
+        <div className="form-item">
+          <h2>Registro de Compras</h2>
+          <FormCompras refreshTrigger={refreshTrigger}></FormCompras>
+        </div>
+      </div>
+
+      <div className="tables-container">
+        <div className="table-item">
+          <h2>Tabela de Usuários</h2>
+          <TableUsuario refreshTrigger={refreshTrigger} onUserDeleted={handleUserDeleted}></TableUsuario>
+        </div>
+        <div className="table-item">
+          <h2>Tabela de Produtos</h2>
+          <TableProduto refreshTrigger={refreshTrigger} onProductDeleted={handleProductDeleted}></TableProduto>
+        </div>
+      </div>
+    </div>
   )
 }
+
 
 export default App

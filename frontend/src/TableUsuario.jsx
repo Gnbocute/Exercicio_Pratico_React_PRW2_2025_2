@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function TableUsuario({ refreshTrigger }) {
+function TableUsuario({ refreshTrigger, onUserDeleted }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,9 +43,9 @@ function TableUsuario({ refreshTrigger }) {
       }
 
       // Refresh the data after successful deletion
-      const refreshResponse = await fetch("http://localhost:3000/usuarios");
-      const refreshedData = await refreshResponse.json();
-      setData(refreshedData);
+      if (onUserDeleted) {
+        onUserDeleted();
+      }
       
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -63,7 +63,6 @@ function TableUsuario({ refreshTrigger }) {
 
   return (
     <>
-      <h1>Usuários</h1>
       <table className="tableUsuario">
         <thead>
           <tr>

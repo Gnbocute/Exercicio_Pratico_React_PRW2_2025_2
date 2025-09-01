@@ -25,12 +25,19 @@ h2 {
   color: #3498db;
 }
 
-.container-flex {
+.forms-container, .tables-container {
   display: flex;
   gap: 2rem;
   justify-content: center;
   align-items: flex-start;
   flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.table-item {
+  flex-grow: 1;
+  flex-basis: 300px;
+  max-width: 600px;
 }
 
 form {
@@ -109,7 +116,7 @@ ul li:hover {
 }
 
 @media (max-width: 800px) {
-  .container-flex {
+  .forms-container, .tables-container {
     flex-direction: column;
     align-items: center;
   }

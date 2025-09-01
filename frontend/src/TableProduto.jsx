@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function TableProduto({ refreshTrigger }) {
+function TableProduto({ refreshTrigger, onProductDeleted }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,9 +47,9 @@ function TableProduto({ refreshTrigger }) {
       }
 
       // Refresh the data after successful deletion
-      const refreshResponse = await fetch("http://localhost:3000/produtos");
-      const refreshedData = await refreshResponse.json();
-      setData(refreshedData);
+      if (onProductDeleted) {
+        onProductDeleted();
+      }
       
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -120,7 +120,6 @@ function TableProduto({ refreshTrigger }) {
 
   return (
     <>
-      <h1>Produtos</h1>
       <table className="tableProduto">
         <thead>
           <tr>

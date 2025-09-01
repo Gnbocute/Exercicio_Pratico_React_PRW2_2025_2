@@ -70,7 +70,6 @@ function FormUsuario({ onUserAdded }) {
 
   return (
     <>
-      <h1>Cadastrar Usuário</h1>
       <form onSubmit={sendUsuario}>
         <label htmlFor="nome">Nome do Usuário</label>
         <input

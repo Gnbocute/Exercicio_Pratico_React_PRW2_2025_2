@@ -1,54 +1,33 @@
-import { use, useState } from "react";
-import axios from "axios";
-import "./App.css";
-import ListarProdutos from "./ListarProdutos";
-import FormProdutos from "./FormProdutos";
-import AdicionarCliente from "./AdicionarCliente";
-import ListarClientes from "./ListarClientes";
-import TableUsuario from "./TableUsuario";
+import './App.css'
+import { useState } from 'react'
+import FormUsuario from './FormUsuario'
+import TableUsuario from './TableUsuario'
+import FormProduto from './FormProduto'
+import TableProduto from './TableProduto'
+
 
 function App() {
-  const [clientes, setClientes] = useState([
-    {
-      nome: "Carlos",
-    },
-    {
-      nome: "Filipao",
-    },
-    {
-      nome: "Bocute",
-    },
-  ]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  function adicionarClientes(novo_cliente) {
-    setClientes([...clientes, novo_cliente]);
-  }
+  const handleUserAdded = () => {
+    // Increment to trigger refresh in TableUsuario
+    setRefreshTrigger(prev => prev + 1);
+  };
 
-  function excluirClientes(indice) {
-    let listaNovaClientes = clientes.filter((valor, i) => i != indice);
-    setClientes(listaNovaClientes);
-  }
-
-  const api = axios.create({
-    baseURL: `http://localhost:3000/`,
-  });
+ const handleProductAdded = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
 
   return (
     <>
-      <div className="geral">
-        <h1>Loja de Smartphone</h1>
-        <div className="formulario">
-          <AdicionarCliente url={api}></AdicionarCliente>
-        </div>
-        <div className="listaClientes">
-          <ListarClientes url={api}></ListarClientes>
-        </div>
-      </div>
-      <FormProduto></FormProduto>
-      <ListarProdutos url={api}></ListarProdutos>
-      <TableUsuario></TableUsuario>
+      <h1>Seja bem vindo!</h1>
+      <p>Desenvolva seu website usando React!</p>
+      <FormUsuario onUserAdded={handleUserAdded}></FormUsuario>
+      <TableUsuario refreshTrigger={refreshTrigger}></TableUsuario>
+      <FormProduto onProductAdded={handleProductAdded}></FormProduto>
+      <TableProduto refreshTrigger={refreshTrigger}></TableProduto>
     </>
-  );
+  )
 }
 
-export default App;
+export default App

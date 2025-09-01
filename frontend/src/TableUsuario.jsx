@@ -1,40 +1,40 @@
 import { useState, useEffect } from "react";
 
-function TableUsuario() {
+function TableUsuario({ refreshTrigger }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
 
-  // Buscar clientes ao montar
+  // Fetch data when component mounts OR when refreshTrigger changes
   useEffect(() => {
     async function fetchUsuarios() {
       try {
+        setLoading(true);
         const response = await fetch("http://localhost:3000/usuarios");
         if (!response.ok) {
           throw new Error(`Response status: ${response.status}`);
         }
         const result = await response.json();
         setData(result);
+        setError(null);
       } catch (error) {
         console.error(error.message);
-        setError("Erro ao buscar usuários");
+        setError("Failed to fetch users");
       } finally {
         setLoading(false);
       }
     }
 
     fetchUsuarios();
-  }, []);
+  }, [refreshTrigger]); // ← refreshTrigger added to dependency array
 
   const handleDelete = async (id) => {
-    setDeletingId(id);
 
     try {
       const response = await fetch(`http://localhost:3000/usuarios/${id}`, {
         method: "DELETE",
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
 
@@ -42,22 +42,23 @@ function TableUsuario() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Se deletar no backend, remove localmente
-      setData((prevData) => prevData.filter((item) => item.id !== id));
+      // Refresh the data after successful deletion
+      const refreshResponse = await fetch("http://localhost:3000/usuarios");
+      const refreshedData = await refreshResponse.json();
+      setData(refreshedData);
+      
     } catch (error) {
-      console.error("Erro ao deletar usuário:", error);
-      setError("Falha ao deletar usuário");
-    } finally {
-      setDeletingId(null);
+      console.error("Error deleting user:", error);
+      setError("Failed to delete user");
     }
   };
 
   if (loading) {
-    return <div>Carregando usuários...</div>;
+    return <div>Loading users...</div>;
   }
 
   if (error) {
-    return <div>Erro: {error}</div>;
+    return <div>Error: {error}</div>;
   }
 
   return (
@@ -72,39 +73,26 @@ function TableUsuario() {
             <th>Ações</th>
           </tr>
         </thead>
-        <tbody id="tableBody">
+        <tbody>
           {data.length > 0 ? (
             data.map((item) => (
               <tr key={item.id}>
                 <td>{item.id}</td>
                 <td>{item.nome}</td>
-                <td>
-                  {item.produtos && item.produtos.length > 0 ? (
-                    <ul>
-                      {item.produtos.map((p) => (
-                        <li key={p.id}>
-                          {p.nome} - R$ {p.preco}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    "Sem produtos"
-                  )}
-                </td>
+                <td>{/* Add products here */}</td>
                 <td>
                   <button
                     className="btn-delete"
                     onClick={() => handleDelete(item.id)}
-                    disabled={deletingId === item.id}
                   >
-                    {deletingId === item.id ? "Deletando..." : "Deletar"}
+                    Deletar
                   </button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="4">Nenhum usuário encontrado</td>
+              <td colSpan="4">No users found</td>
             </tr>
           )}
         </tbody>

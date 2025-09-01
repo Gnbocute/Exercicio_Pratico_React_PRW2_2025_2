@@ -1,15 +1,14 @@
 import { use, useState } from "react";
 import axios from "axios";
-import './App.css'
-import ListarProdutos from './ListarProdutos'
-import AdicionarProduto from "./AdicionarProduto";
+import "./App.css";
+import ListarProdutos from "./ListarProdutos";
+import FormProdutos from "./FormProdutos";
 import AdicionarCliente from "./AdicionarCliente";
 import ListarClientes from "./ListarClientes";
-
+import TableUsuario from "./TableUsuario";
 
 function App() {
-
-   const [clientes, setClientes] = useState([
+  const [clientes, setClientes] = useState([
     {
       nome: "Carlos",
     },
@@ -21,8 +20,7 @@ function App() {
     },
   ]);
 
-
-   function adicionarClientes(novo_cliente) {
+  function adicionarClientes(novo_cliente) {
     setClientes([...clientes, novo_cliente]);
   }
 
@@ -32,24 +30,25 @@ function App() {
   }
 
   const api = axios.create({
-    baseURL: `http://localhost:3000/`
-    })
+    baseURL: `http://localhost:3000/`,
+  });
 
   return (
     <>
-       <div className="geral">
+      <div className="geral">
         <h1>Loja de Smartphone</h1>
         <div className="formulario">
-        <AdicionarCliente url={api}></AdicionarCliente>
+          <AdicionarCliente url={api}></AdicionarCliente>
         </div>
         <div className="listaClientes">
           <ListarClientes url={api}></ListarClientes>
         </div>
       </div>
-    <AdicionarProduto url={api}></AdicionarProduto>
-    <ListarProdutos url={api}></ListarProdutos>
+      <FormProduto></FormProduto>
+      <ListarProdutos url={api}></ListarProdutos>
+      <TableUsuario></TableUsuario>
     </>
-  )
+  );
 }
 
 export default App;

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-function FormProduto({ onChangeData }) {
+function FormProduto() {
   const [formData, setFormData] = useState({ nome: "", preco: "" });
 
   const handleChange = (e) => {
@@ -17,7 +17,8 @@ function FormProduto({ onChangeData }) {
         preco: parseFloat(formData.preco)
       });
       setFormData({ nome: "", preco: "" });
-      onChangeData?.(); // avisa App para atualizar tabela
+      // dispara evento global para avisar que dados mudaram
+      window.dispatchEvent(new Event("dadosAtualizados"));
     } catch (error) {
       console.error("Erro ao cadastrar produto:", error);
     }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function FormCompras({ onChangeData }) {
+function FormCompras() {
   const [usuarios, setUsuarios] = useState([]);
   const [produtos, setProdutos] = useState([]);
   const [compra, setCompra] = useState({ usuarioId: "", produtoId: "" });
@@ -21,6 +21,13 @@ function FormCompras({ onChangeData }) {
 
   useEffect(() => {
     fetchData();
+
+    const handleUpdate = () => fetchData();
+    window.addEventListener("dadosAtualizados", handleUpdate);
+
+    return () => {
+      window.removeEventListener("dadosAtualizados", handleUpdate);
+    };
   }, []);
 
   const handleSubmit = async (e) => {
@@ -30,10 +37,10 @@ function FormCompras({ onChangeData }) {
         id_produto: compra.produtoId,
         id_usuario: compra.usuarioId
       });
-      alert("Compra realizada com sucesso!");
       setCompra({ usuarioId: "", produtoId: "" });
       fetchData();
-      onChangeData?.(); // força atualizar tabelas
+      // 🚀 dispara evento global -> TableUsuario será atualizada
+      window.dispatchEvent(new Event("dadosAtualizados"));
     } catch (error) {
       console.error("Erro ao realizar compra:", error);
       alert("Erro ao realizar compra");

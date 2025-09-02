@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function TableUsuario({ refresh }) {
+function TableUsuario() {
   const [usuarios, setUsuarios] = useState([]);
 
+  // busca lista de usuários do backend
   const fetchUsuarios = async () => {
     try {
       const response = await axios.get("http://localhost:3000/usuarios");
@@ -13,10 +14,13 @@ function TableUsuario({ refresh }) {
     }
   };
 
+  // exclusão de usuário
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:3000/usuarios/${id}`);
       fetchUsuarios();
+      // dispara evento para atualizar todos os componentes interessados
+      window.dispatchEvent(new Event("dadosAtualizados"));
     } catch (error) {
       console.error("Erro ao deletar usuário:", error);
     }
@@ -24,7 +28,15 @@ function TableUsuario({ refresh }) {
 
   useEffect(() => {
     fetchUsuarios();
-  }, [refresh]);
+
+    // ouve quando dados forem atualizados em qualquer parte do sistema
+    const handleUpdate = () => fetchUsuarios();
+    window.addEventListener("dadosAtualizados", handleUpdate);
+
+    return () => {
+      window.removeEventListener("dadosAtualizados", handleUpdate);
+    };
+  }, []);
 
   return (
     <table className="tableUsuario">
@@ -42,7 +54,7 @@ function TableUsuario({ refresh }) {
             <td>{usuario.id}</td>
             <td>{usuario.nome}</td>
             <td>
-                {usuario.produtos.map(p => (
+              {usuario.produtos.map((p) => (
                   <span key={p.id}>
                     {p.nome} (R$ {parseFloat(p.preco).toFixed(2)})
                     <br />

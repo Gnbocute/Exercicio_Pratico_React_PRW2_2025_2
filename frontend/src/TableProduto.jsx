@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function TableProduto({ refresh }) {
+function TableProduto() {
   const [produtos, setProdutos] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ nome: "", preco: "" });
@@ -19,6 +19,8 @@ function TableProduto({ refresh }) {
     try {
       await axios.delete(`http://localhost:3000/produtos/${id}`);
       fetchProdutos();
+      // dispara evento para avisar que dados mudaram
+      window.dispatchEvent(new Event("dadosAtualizados"));
     } catch (error) {
       console.error("Erro ao deletar produto:", error);
     }
@@ -37,6 +39,8 @@ function TableProduto({ refresh }) {
       });
       setEditingId(null);
       fetchProdutos();
+      // dispara evento para avisar que dados mudaram
+      window.dispatchEvent(new Event("dadosAtualizados"));
     } catch (error) {
       console.error("Erro ao editar produto:", error);
     }
@@ -44,7 +48,14 @@ function TableProduto({ refresh }) {
 
   useEffect(() => {
     fetchProdutos();
-  }, [refresh]); // recarrega quando refresh mudar
+
+    const handleUpdate = () => fetchProdutos();
+    window.addEventListener("dadosAtualizados", handleUpdate);
+
+    return () => {
+      window.removeEventListener("dadosAtualizados", handleUpdate);
+    };
+  }, []);
 
   return (
     <table className="tableProduto">

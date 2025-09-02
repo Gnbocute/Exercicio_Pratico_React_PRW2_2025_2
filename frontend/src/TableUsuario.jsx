@@ -1,102 +1,57 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 function TableUsuario({ refreshTrigger, onUserDeleted }) {
-  const [data, setData] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Fetch data when component mounts OR when refreshTrigger changes
   useEffect(() => {
-    async function fetchUsuarios() {
-      try {
-        setLoading(true);
-        const response = await fetch("http://localhost:3000/usuarios");
-        if (!response.ok) {
-          throw new Error(`Response status: ${response.status}`);
-        }
-        const result = await response.json();
-        setData(result);
-        setError(null);
-      } catch (error) {
-        console.error(error.message);
-        setError("Failed to fetch users");
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchUsuarios();
-  }, [refreshTrigger]); // ← refreshTrigger added to dependency array
+  }, [refreshTrigger]);
 
-  const handleDelete = async (id) => {
-
+  const fetchUsuarios = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/usuarios/${id}`, {
-        method: "DELETE",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      // Refresh the data after successful deletion
-      if (onUserDeleted) {
-        onUserDeleted();
-      }
-      
+      const response = await axios.get("http://localhost:3000/usuarios");
+      setUsuarios(response.data);
     } catch (error) {
-      console.error("Error deleting user:", error);
-      setError("Failed to delete user");
+      console.error("Erro ao buscar usuários:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) {
-    return <div>Loading users...</div>;
-  }
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/usuarios/${id}`);
+      onUserDeleted?.();
+    } catch (error) {
+      console.error("Erro ao deletar usuário:", error);
+    }
+  };
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  if (loading) return <div>Carregando usuários...</div>;
 
   return (
-    <>
-      <table className="tableUsuario">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Produtos</th>
-            <th>Ações</th>
+    <table className="tableUsuario">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {usuarios.map((usuario) => (
+          <tr key={usuario.id}>
+            <td>{usuario.id}</td>
+            <td>{usuario.nome}</td>
+            <td>
+              <button onClick={() => handleDelete(usuario.id)}>Deletar</button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {data.length > 0 ? (
-            data.map((item) => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td>{item.nome}</td>
-                <td>{/* Add products here */}</td>
-                <td>
-                  <button
-                    className="btn-delete"
-                    onClick={() => handleDelete(item.id)}
-                  >
-                    Deletar
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4">No users found</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </>
+        ))}
+      </tbody>
+    </table>
   );
 }
 

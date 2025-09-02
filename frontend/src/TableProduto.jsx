@@ -1,208 +1,110 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 function TableProduto({ refreshTrigger, onProductDeleted }) {
-  const [data, setData] = useState([]);
+  const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({
-    nome: "",
-    preco: ""
-  });
+  const [editForm, setEditForm] = useState({ nome: "", preco: "" });
 
-  // Fetch data when component mounts OR when refreshTrigger changes
   useEffect(() => {
-    async function fetchProdutos() {
-      try {
-        setLoading(true);
-        const response = await fetch("http://localhost:3000/produtos");
-        if (!response.ok) {
-          throw new Error(`Response status: ${response.status}`);
-        }
-        const result = await response.json();
-        setData(result);
-        setError(null);
-      } catch (error) {
-        console.error(error.message);
-        setError("Failed to fetch products");
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchProdutos();
   }, [refreshTrigger]);
 
-  const handleDelete = async (id) => {
+  const fetchProdutos = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/produtos/${id}`, {
-        method: "DELETE",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      // Refresh the data after successful deletion
-      if (onProductDeleted) {
-        onProductDeleted();
-      }
-      
+      const response = await axios.get("http://localhost:3000/produtos");
+      setProdutos(response.data);
     } catch (error) {
-      console.error("Error deleting product:", error);
-      setError("Failed to delete product");
+      console.error("Erro ao buscar produtos:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleEdit = (product) => {
-    setEditingId(product.id);
-    setEditForm({
-      nome: product.nome,
-      preco: product.preco
-    });
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/produtos/${id}`);
+      onProductDeleted?.();
+    } catch (error) {
+      console.error("Erro ao deletar produto:", error);
+    }
   };
 
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setEditForm(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleEdit = (produto) => {
+    setEditingId(produto.id);
+    setEditForm({ nome: produto.nome, preco: produto.preco });
   };
 
   const handleEditSubmit = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3000/produtos/${id}`, {
-        method: "PUT",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...editForm,
-          preco: parseFloat(editForm.preco)
-        }),
+      await axios.put(`http://localhost:3000/produtos/${id}`, {
+        ...editForm,
+        preco: parseFloat(editForm.preco)
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      // Refresh the data after successful update
-      const refreshResponse = await fetch("http://localhost:3000/produtos");
-      const refreshedData = await refreshResponse.json();
-      setData(refreshedData);
-      
-      // Reset editing state
       setEditingId(null);
-      setEditForm({ nome: "", preco: "" });
-      
+      fetchProdutos();
     } catch (error) {
-      console.error("Error updating product:", error);
-      setError("Failed to update product");
+      console.error("Erro ao editar produto:", error);
     }
   };
 
-  const handleCancelEdit = () => {
-    setEditingId(null);
-    setEditForm({ nome: "", preco: "" });
-  };
-
-  if (loading) {
-    return <div>Loading products...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  if (loading) return <div>Carregando produtos...</div>;
 
   return (
-    <>
-      <table className="tableProduto">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Preço</th>
-            <th>Ações</th>
+    <table className="tableProduto">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Preço</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {produtos.map((produto) => (
+          <tr key={produto.id}>
+            <td>{produto.id}</td>
+            <td>
+              {editingId === produto.id ? (
+                <input
+                  type="text"
+                  value={editForm.nome}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, nome: e.target.value }))}
+                />
+              ) : (
+                produto.nome
+              )}
+            </td>
+            <td>
+              {editingId === produto.id ? (
+                <input
+                  type="number"
+                  value={editForm.preco}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, preco: e.target.value }))}
+                  step="0.01"
+                />
+              ) : (
+                `R$ ${parseFloat(produto.preco).toFixed(2)}`
+              )}
+            </td>
+            <td>
+              {editingId === produto.id ? (
+                <>
+                  <button onClick={() => handleEditSubmit(produto.id)}>Salvar</button>
+                  <button onClick={() => setEditingId(null)}>Cancelar</button>
+                </>
+              ) : (
+                <>
+                  <button onClick={() => handleEdit(produto)}>Editar</button>
+                  <button onClick={() => handleDelete(produto.id)}>Deletar</button>
+                </>
+              )}
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {data.length > 0 ? (
-            data.map((item) => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td>
-                  {editingId === item.id ? (
-                    <input
-                      type="text"
-                      name="nome"
-                      value={editForm.nome}
-                      onChange={handleEditChange}
-                    />
-                  ) : (
-                    item.nome
-                  )}
-                </td>
-                <td>
-                  {editingId === item.id ? (
-                    <input
-                      type="number"
-                      name="preco"
-                      value={editForm.preco}
-                      onChange={handleEditChange}
-                      step="0.01"
-                      min="0"
-                    />
-                  ) : (
-                    `R$ ${parseFloat(item.preco).toFixed(2)}`
-                  )}
-                </td>
-                <td>
-                  {editingId === item.id ? (
-                    <>
-                      <button
-                        className="btn-save"
-                        onClick={() => handleEditSubmit(item.id)}
-                      >
-                        Salvar
-                      </button>
-                      <button
-                        className="btn-cancel"
-                        onClick={handleCancelEdit}
-                      >
-                        Cancelar
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        className="btn-edit"
-                        onClick={() => handleEdit(item)}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="btn-delete"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        Deletar
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4">No products found</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </>
+        ))}
+      </tbody>
+    </table>
   );
 }
 

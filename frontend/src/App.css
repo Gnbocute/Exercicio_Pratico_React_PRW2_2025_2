@@ -9,7 +9,7 @@ body {
 .geral {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 1rem;  /* 2rem em cima/baixo, 1rem nas laterais */
   text-align: center;
 }
 
@@ -27,7 +27,7 @@ h2 {
 
 .forms-container, .tables-container {
   display: flex;
-  gap: 2rem;
+  gap: 6rem;            /* aumenta distância entre as tabelas */
   justify-content: center;
   align-items: flex-start;
   flex-wrap: wrap;
@@ -36,10 +36,37 @@ h2 {
 
 .table-item {
   flex-grow: 1;
-  flex-basis: 300px;
-  max-width: 600px;
+  flex-basis: 450px;   /* largura mínima menor */
+  max-width: 550px;    /* cabe duas tabelas lado a lado */
 }
 
+/* === ESTILO PARA TABELAS === */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1e1e1e;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+th, td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #333;
+}
+
+th {
+  background: #2c2c2c;
+  color: #3498db;
+  font-weight: bold;
+}
+
+tr:hover {
+  background: #2a2a2a;
+}
+
+/* === FORMULÁRIOS === */
 form {
   background: #1e1e1e;
   padding: 1.5rem;
@@ -91,6 +118,7 @@ button:hover {
   transform: translateY(-2px);
 }
 
+/* === LISTAS === */
 .listaClientes,
 ul {
   list-style: none;
@@ -115,10 +143,43 @@ ul li:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
 }
 
+/* === RESPONSIVIDADE === */
 @media (max-width: 800px) {
   .forms-container, .tables-container {
     flex-direction: column;
     align-items: center;
   }
+
+  .table-item {
+    max-width: 100%;
+  }
 }
 
+/* === CENTRALIZAR COLUNA PRODUTOS DA TABELA DE USUÁRIOS === */
+.tableUsuario th:nth-child(3),
+.tableUsuario td:nth-child(3) {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Centralizar também o conteúdo (texto + botão) dentro da célula */
+.tableUsuario td:nth-child(3) > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px; /* espaço entre nome e botão */
+}
+
+
+
+.tableUsuario td:nth-child(3) > div {
+  margin-bottom: 6px; /* aumenta distância entre linhas de produtos */
+}
+
+/* === TABELA DE USUÁRIOS 20% MAIOR === */
+.tableUsuario {
+  width: 115%;    /* 20% maior que 550px */
+}
+.tableProduto td button:last-child {
+  margin-left: 8px; /* evita margem no último botão */
+}

@@ -15,21 +15,31 @@ function TableUsuario() {
   };
 
   // exclusão de usuário
-  const handleDelete = async (id) => {
+  const handleDeleteUsuario = async (id) => {
     try {
       await axios.delete(`http://localhost:3000/usuarios/${id}`);
       fetchUsuarios();
-      // dispara evento para atualizar todos os componentes interessados
       window.dispatchEvent(new Event("dadosAtualizados"));
     } catch (error) {
       console.error("Erro ao deletar usuário:", error);
     }
   };
 
+  // exclusão de compra (produto de um usuário)
+  const handleDeleteCompra = async (usuarioId, produtoId) => {
+    try {
+      await axios.delete(`http://localhost:3000/compras/${produtoId}/${usuarioId}`);
+      fetchUsuarios();
+      window.dispatchEvent(new Event("dadosAtualizados"));
+    } catch (error) {
+      console.error("Erro ao excluir compra:", error);
+    }
+  };
+
   useEffect(() => {
     fetchUsuarios();
 
-    // ouve quando dados forem atualizados em qualquer parte do sistema
+    // escuta evento global de atualização
     const handleUpdate = () => fetchUsuarios();
     window.addEventListener("dadosAtualizados", handleUpdate);
 
@@ -55,15 +65,18 @@ function TableUsuario() {
             <td>{usuario.nome}</td>
             <td>
               {usuario.produtos.map((p) => (
-                  <span key={p.id}>
-                    {p.nome} (R$ {parseFloat(p.preco).toFixed(2)})
-                    <br />
-                  </span>
-                ))
-              }
+                  <div key={p.id} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span>
+                      {p.nome} (R$ {parseFloat(p.preco).toFixed(2)})
+                    </span>
+                    <button onClick={() => handleDeleteCompra(usuario.id, p.id)}>
+                      Excluir
+                    </button>
+                  </div>
+                ))}
             </td>
             <td>
-              <button onClick={() => handleDelete(usuario.id)}>Deletar</button>
+              <button onClick={() => handleDeleteUsuario(usuario.id)}>Deletar</button>
             </td>
           </tr>
         ))}

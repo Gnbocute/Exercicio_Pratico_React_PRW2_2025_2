@@ -7,7 +7,6 @@ import TableProduto from './TableProduto'
 import FormCompras from './FormCompras'
 
 function App() {
-  // contador para forçar recarregar dados nas tabelas
   const [refresh, setRefresh] = useState(0);
 
   const handleRefresh = () => setRefresh(prev => prev + 1);

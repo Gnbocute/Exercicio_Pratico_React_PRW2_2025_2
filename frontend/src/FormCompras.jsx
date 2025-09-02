@@ -39,7 +39,6 @@ function FormCompras() {
       });
       setCompra({ usuarioId: "", produtoId: "" });
       fetchData();
-      // 🚀 dispara evento global -> TableUsuario será atualizada
       window.dispatchEvent(new Event("dadosAtualizados"));
     } catch (error) {
       console.error("Erro ao realizar compra:", error);

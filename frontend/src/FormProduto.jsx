@@ -17,7 +17,7 @@ function FormProduto() {
         preco: parseFloat(formData.preco)
       });
       setFormData({ nome: "", preco: "" });
-      // dispara evento global para avisar que dados mudaram
+      // dispara evento para avisar que dados mudaram
       window.dispatchEvent(new Event("dadosAtualizados"));
     } catch (error) {
       console.error("Erro ao cadastrar produto:", error);

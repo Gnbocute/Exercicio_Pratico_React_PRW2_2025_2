@@ -39,7 +39,7 @@ function TableUsuario() {
   useEffect(() => {
     fetchUsuarios();
 
-    // escuta evento global de atualização
+    // escuta evento de atualização
     const handleUpdate = () => fetchUsuarios();
     window.addEventListener("dadosAtualizados", handleUpdate);
 

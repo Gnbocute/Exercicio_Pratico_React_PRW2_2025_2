@@ -37,6 +37,7 @@ function FormCompras() {
         id_produto: compra.produtoId,
         id_usuario: compra.usuarioId
       });
+      // dispara evento para atualizar os dados
       setCompra({ usuarioId: "", produtoId: "" });
       fetchData();
       window.dispatchEvent(new Event("dadosAtualizados"));

@@ -24,7 +24,7 @@ function TableUsuario({ refresh }) {
 
   useEffect(() => {
     fetchUsuarios();
-  }, [refresh]); // recarrega sempre que refresh mudar
+  }, [refresh]);
 
   return (
     <table className="tableUsuario">
@@ -32,7 +32,7 @@ function TableUsuario({ refresh }) {
         <tr>
           <th>ID</th>
           <th>Nome</th>
-          <th>Produto</th>
+          <th>Produtos</th>
           <th>Ações</th>
         </tr>
       </thead>
@@ -41,7 +41,15 @@ function TableUsuario({ refresh }) {
           <tr key={usuario.id}>
             <td>{usuario.id}</td>
             <td>{usuario.nome}</td>
-            <td>{usuario.produto}</td>
+            <td>
+                {usuario.produtos.map(p => (
+                  <span key={p.id}>
+                    {p.nome} (R$ {parseFloat(p.preco).toFixed(2)})
+                    <br />
+                  </span>
+                ))
+              }
+            </td>
             <td>
               <button onClick={() => handleDelete(usuario.id)}>Deletar</button>
             </td>

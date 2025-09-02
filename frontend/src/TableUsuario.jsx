@@ -1,13 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function TableUsuario({ refreshTrigger, onUserDeleted }) {
+function TableUsuario({ refresh }) {
   const [usuarios, setUsuarios] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchUsuarios();
-  }, [refreshTrigger]);
 
   const fetchUsuarios = async () => {
     try {
@@ -15,21 +10,21 @@ function TableUsuario({ refreshTrigger, onUserDeleted }) {
       setUsuarios(response.data);
     } catch (error) {
       console.error("Erro ao buscar usuários:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:3000/usuarios/${id}`);
-      onUserDeleted?.();
+      fetchUsuarios();
     } catch (error) {
       console.error("Erro ao deletar usuário:", error);
     }
   };
 
-  if (loading) return <div>Carregando usuários...</div>;
+  useEffect(() => {
+    fetchUsuarios();
+  }, [refresh]); // recarrega sempre que refresh mudar
 
   return (
     <table className="tableUsuario">
@@ -37,6 +32,7 @@ function TableUsuario({ refreshTrigger, onUserDeleted }) {
         <tr>
           <th>ID</th>
           <th>Nome</th>
+          <th>Produto</th>
           <th>Ações</th>
         </tr>
       </thead>
@@ -45,6 +41,7 @@ function TableUsuario({ refreshTrigger, onUserDeleted }) {
           <tr key={usuario.id}>
             <td>{usuario.id}</td>
             <td>{usuario.nome}</td>
+            <td>{usuario.produto}</td>
             <td>
               <button onClick={() => handleDelete(usuario.id)}>Deletar</button>
             </td>

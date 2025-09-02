@@ -1,15 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function TableProduto({ refreshTrigger, onProductDeleted }) {
+function TableProduto({ refresh }) {
   const [produtos, setProdutos] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ nome: "", preco: "" });
-
-  useEffect(() => {
-    fetchProdutos();
-  }, [refreshTrigger]);
 
   const fetchProdutos = async () => {
     try {
@@ -17,15 +12,13 @@ function TableProduto({ refreshTrigger, onProductDeleted }) {
       setProdutos(response.data);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:3000/produtos/${id}`);
-      onProductDeleted?.();
+      fetchProdutos();
     } catch (error) {
       console.error("Erro ao deletar produto:", error);
     }
@@ -49,7 +42,9 @@ function TableProduto({ refreshTrigger, onProductDeleted }) {
     }
   };
 
-  if (loading) return <div>Carregando produtos...</div>;
+  useEffect(() => {
+    fetchProdutos();
+  }, [refresh]); // recarrega quando refresh mudar
 
   return (
     <table className="tableProduto">

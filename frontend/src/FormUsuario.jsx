@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-function FormUsuario({ onUserAdded }) {
+function FormUsuario({ onChangeData }) {
   const [nome, setNome] = useState("");
 
   const handleSubmit = async (e) => {
@@ -9,7 +9,7 @@ function FormUsuario({ onUserAdded }) {
     try {
       await axios.post("http://localhost:3000/usuarios", { nome });
       setNome("");
-      onUserAdded?.();
+      onChangeData?.(); // avisa App para atualizar tabela
     } catch (error) {
       console.error("Erro ao cadastrar usuário:", error);
     }

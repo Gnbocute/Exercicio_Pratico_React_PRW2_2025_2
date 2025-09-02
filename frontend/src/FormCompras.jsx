@@ -1,14 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function FormCompras({ refreshTrigger }) {
+function FormCompras({ onChangeData }) {
   const [usuarios, setUsuarios] = useState([]);
   const [produtos, setProdutos] = useState([]);
   const [compra, setCompra] = useState({ usuarioId: "", produtoId: "" });
-
-  useEffect(() => {
-    fetchData();
-  }, [refreshTrigger]);
 
   const fetchData = async () => {
     try {
@@ -23,6 +19,10 @@ function FormCompras({ refreshTrigger }) {
     }
   };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -32,6 +32,8 @@ function FormCompras({ refreshTrigger }) {
       });
       alert("Compra realizada com sucesso!");
       setCompra({ usuarioId: "", produtoId: "" });
+      fetchData();
+      onChangeData?.(); // força atualizar tabelas
     } catch (error) {
       console.error("Erro ao realizar compra:", error);
       alert("Erro ao realizar compra");

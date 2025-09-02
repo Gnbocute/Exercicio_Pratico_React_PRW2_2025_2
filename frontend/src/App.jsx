@@ -6,59 +6,43 @@ import FormProduto from './FormProduto'
 import TableProduto from './TableProduto'
 import FormCompras from './FormCompras'
 
-
 function App() {
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  // contador para forçar recarregar dados nas tabelas
+  const [refresh, setRefresh] = useState(0);
 
-  const handleUserAdded = () => {
-    // Increment to trigger refresh in TableUsuario
-    setRefreshTrigger(prev => prev + 1);
-  };
+  const handleRefresh = () => setRefresh(prev => prev + 1);
 
- const handleProductAdded = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
-
-   const handleUserDeleted = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
-
-  const handleProductDeleted = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
-
- return (
+  return (
     <div className="geral">
       <h1>Sistema de Vendas</h1>
       
       <div className="forms-container">
         <div className="form-item">
           <h2>Cadastro de Usuários</h2>
-          <FormUsuario onUserAdded={handleUserAdded}></FormUsuario>
+          <FormUsuario onChangeData={handleRefresh} />
         </div>
         <div className="form-item">
           <h2>Cadastro de Produtos</h2>
-          <FormProduto onProductAdded={handleProductAdded}></FormProduto>
+          <FormProduto onChangeData={handleRefresh} />
         </div>
         <div className="form-item">
           <h2>Registro de Compras</h2>
-          <FormCompras refreshTrigger={refreshTrigger}></FormCompras>
+          <FormCompras onChangeData={handleRefresh} />
         </div>
       </div>
 
       <div className="tables-container">
         <div className="table-item">
           <h2>Tabela de Usuários</h2>
-          <TableUsuario refreshTrigger={refreshTrigger} onUserDeleted={handleUserDeleted}></TableUsuario>
+          <TableUsuario refresh={refresh} />
         </div>
         <div className="table-item">
           <h2>Tabela de Produtos</h2>
-          <TableProduto refreshTrigger={refreshTrigger} onProductDeleted={handleProductDeleted}></TableProduto>
+          <TableProduto refresh={refresh} />
         </div>
       </div>
     </div>
   )
 }
-
 
 export default App
